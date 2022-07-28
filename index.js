@@ -24,4 +24,9 @@ function prompts() {
             //call function to handle conditional
         })
 }
+
+function displayEmployees() {
+    DBclass.findAllEmployees()
+    .then
+}
 init();
