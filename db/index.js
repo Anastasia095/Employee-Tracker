@@ -14,7 +14,7 @@ class DBclass {
         return this.connection.promise().query("SELECT department_name.id FROM department_name")
     }
     findAllRoles() {
-        return this.connection.promise().query("SELECT roles.title AS 'Role Title' , roles.id AS 'Role ID' FROM roles");
+        return this.connection.promise().query("SELECT roles.title AS 'Job Title' , roles.id AS 'Role ID', department_name.dep_name AS 'Department', roles.salary AS 'Role Salary' FROM roles LEFT JOIN department_name on roles.department_id = department_name.id;");
     }
     //create a new department
     addDepartment(department) {

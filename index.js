@@ -118,7 +118,7 @@ function displayRoles() {
             console.table(roles);
             restart();
         });
-    
+
 };
 //function to display all employees
 function displayEmployees() {
@@ -147,7 +147,7 @@ function AddDepartment() {
             console.log(answers)
             dbIndex.addDepartment(answers.depName)
                 .then(console.log("New Department '" + answers.depName + "' has been added!"));
-                restart();
+            restart();
         })
 
 };
@@ -165,7 +165,7 @@ function addEmployee() {
         .then((answers) => {
             dbIndex.addEmployee(answers)
                 .then(console.log("New Employee '" + answers.firstName + " " + answers.lastName + " has been added!"));
-                restart();
+            restart();
         })
 };
 
