@@ -9,6 +9,7 @@ This program is an employee tracker application. It allows you to create employe
 
 ## Links
 https://github.com/Anastasia095/Employee-Tracker
+Video: https://drive.google.com/file/d/1CueRk97KmN_wDobfV1Ytjto_zw0GyCCD/view
   ## Table of Content
   - [Installation](#installation)
   - [Usage](#usage)
