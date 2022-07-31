@@ -8,7 +8,7 @@ const options = [
     {
         type: 'list',
         name: 'choice',
-        choices: ['View all roles', 'View all employees', 'View all departments', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role'],
+        choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role'],
         message: 'What would you like to do?',
     },
 
@@ -64,6 +64,69 @@ const addDepartmentQ = [
 function init() {
     const displayLogo = logo({ name: "employee Manager " }).render();
 
+    function updateRole() {
+        dbIndex.employeeInfo().then(([rows]) => {
+            let employees1 = rows;
+            const list = employees1.map(i => Object.values(i));
+            const mergedList = [].concat.apply([], list);
+            const employees = [];
+            const eID = [];
+             //checking for odd or even number to use in loop below, because there is the same numbers of employees and IDs i'm doing it to separate data.
+             function isEven(value) {
+                if (value%2 == 0)
+                    return true;
+                else
+                    return false;
+            };
+            //this loop will split the returned data into 2 arrays 1 witn employees names and 2 with IDs to use with inquirer. 
+            for (var i = 0; i < mergedList.length; i++) {
+                if(isEven(i)) {
+                    employees.push(mergedList[i]);
+                } else {
+                    eID.push(mergedList[i]);
+                }
+            };
+            dbIndex.roleInfo().then(([rows]) => {
+                let roles1 = rows;
+                const rList = roles1.map(i => Object.values(i));
+                const mergedRList = [].concat.apply([], rList);
+                const rTitles = [];
+                const rID = [];
+            //this loop will split the returned data into 2 arrays 1 witn employees names and 2 with IDs to use with inquirer. 
+            for (var i = 0; i < mergedRList.length; i++) {
+                if(isEven(i)) {
+                    rTitles.push(mergedRList[i]);
+                } else {
+                    rID.push(mergedRList[i]);
+                }
+            };
+
+            const changeRole = [
+                {
+                    type: 'list',
+                    name: 'employee',
+                    choices: employees,
+                    message: 'Which employee would you like to update?',
+                },
+                {
+                    type: 'list',
+                    name: 'role',
+                    choices: rTitles,
+                    message: 'Select new Role',
+                },
+
+
+            ];
+            inquirer.prompt(changeRole).then((answer) => {
+                //getting indexes for employee elements and roles, to get ID index
+                let index = employees.indexOf(answer.employee);
+                let roleIndex = rTitles.indexOf(answer.role);
+                dbIndex.updateRoles(rID[roleIndex], eID[index]).then(console.log(`Role of the following employee ${answer.employee} has been updated. New role: ${answer.role}`)); 
+            });
+        });
+        });
+    
+    }
     prompts();
 }
 
@@ -103,8 +166,11 @@ function prompts() {
                 case 'Add an employee':
                     addEmployee();
                     break;
+                case 'Update an employee role':
+                    updateRole();
+                    break;
                 default:
-                    console.log("switch is broken")
+                    console.log("Error please restart program")
             }
 
         })
@@ -168,9 +234,5 @@ function addEmployee() {
             restart();
         })
 };
-
-
-
-
 
 init();
