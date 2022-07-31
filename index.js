@@ -67,8 +67,7 @@ function init() {
     const displayLogo = logo({ name: "employee Manager " }).render();
     //rendering logo
     console.log(displayLogo);
-    addRole();
-    // prompts();
+    prompts();
 }
 
 function restart() {
@@ -79,7 +78,7 @@ function restart() {
                     prompts();
                     break;
                 default:
-                    return;
+                    process.exit();
             }
 
         })
