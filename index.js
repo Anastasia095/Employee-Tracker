@@ -3,6 +3,33 @@ const logo = require("asciiart-logo");
 const dbIndex = require("./db");
 require("console.table");
 
+//******TOOLS */
+//checking for odd or even number to use in loops to sort data.
+function isEven(value) {
+    if (value % 2 == 0)
+        return true;
+    else
+        return false;
+};
+//this function gets object from query function, these objects have 2 pairs of values and keys, this function splites them up in 2 arrays and returns them as an object.
+function getCurrentData(data) {
+    const list = data.map(i => Object.values(i));
+    const mergedList = [].concat.apply([], list);
+
+    const arrName = [];
+    const arrID = [];
+    //this loop will split the returned data into 2 arrays 1 witn employees names and 2 with IDs to use with inquirer. 
+    for (var i = 0; i < mergedList.length; i++) {
+        if (isEven(i)) {
+            arrName.push(mergedList[i]);
+        } else {
+            arrID.push(mergedList[i]);
+        }
+    };
+
+    return [arrName, arrID];
+}
+//********** */
 const options = [
 
     {
@@ -36,23 +63,6 @@ const addRoleQ = [
     },
 ];
 
-const addEmployeeQ = [
-    {
-        type: 'input',
-        name: 'firstName',
-        message: 'Enter First Name',
-    },
-    {
-        type: 'input',
-        name: 'lastName',
-        message: 'Enter Last Name',
-    },
-    {
-        type: 'input',
-        name: 'roleId',
-        message: 'Enter Role Id',
-    },
-];
 const addDepartmentQ = [
     {
         type: 'input',
@@ -63,70 +73,8 @@ const addDepartmentQ = [
 ];
 function init() {
     const displayLogo = logo({ name: "employee Manager " }).render();
-
-    function updateRole() {
-        dbIndex.employeeInfo().then(([rows]) => {
-            let employees1 = rows;
-            const list = employees1.map(i => Object.values(i));
-            const mergedList = [].concat.apply([], list);
-            const employees = [];
-            const eID = [];
-             //checking for odd or even number to use in loop below, because there is the same numbers of employees and IDs i'm doing it to separate data.
-             function isEven(value) {
-                if (value%2 == 0)
-                    return true;
-                else
-                    return false;
-            };
-            //this loop will split the returned data into 2 arrays 1 witn employees names and 2 with IDs to use with inquirer. 
-            for (var i = 0; i < mergedList.length; i++) {
-                if(isEven(i)) {
-                    employees.push(mergedList[i]);
-                } else {
-                    eID.push(mergedList[i]);
-                }
-            };
-            dbIndex.roleInfo().then(([rows]) => {
-                let roles1 = rows;
-                const rList = roles1.map(i => Object.values(i));
-                const mergedRList = [].concat.apply([], rList);
-                const rTitles = [];
-                const rID = [];
-            //this loop will split the returned data into 2 arrays 1 witn employees names and 2 with IDs to use with inquirer. 
-            for (var i = 0; i < mergedRList.length; i++) {
-                if(isEven(i)) {
-                    rTitles.push(mergedRList[i]);
-                } else {
-                    rID.push(mergedRList[i]);
-                }
-            };
-
-            const changeRole = [
-                {
-                    type: 'list',
-                    name: 'employee',
-                    choices: employees,
-                    message: 'Which employee would you like to update?',
-                },
-                {
-                    type: 'list',
-                    name: 'role',
-                    choices: rTitles,
-                    message: 'Select new Role',
-                },
-
-
-            ];
-            inquirer.prompt(changeRole).then((answer) => {
-                //getting indexes for employee elements and roles, to get ID index
-                let index = employees.indexOf(answer.employee);
-                let roleIndex = rTitles.indexOf(answer.role);
-                dbIndex.updateRoles(rID[roleIndex], eID[index]).then(console.log(`Role of the following employee ${answer.employee} has been updated. New role: ${answer.role}`)); 
-            });
-        });
-        });
-    
-    }
+    //rendering logo
+    console.log(displayLogo);
     prompts();
 }
 
@@ -210,7 +158,6 @@ function displayDepartments() {
 function AddDepartment() {
     inquirer.prompt(addDepartmentQ)
         .then((answers) => {
-            console.log(answers)
             dbIndex.addDepartment(answers.depName)
                 .then(console.log("New Department '" + answers.depName + "' has been added!"));
             restart();
@@ -227,12 +174,101 @@ function addRole() {
 };
 
 function addEmployee() {
-    inquirer.prompt(addEmployeeQ)
-        .then((answers) => {
-            dbIndex.addEmployee(answers)
-                .then(console.log("New Employee '" + answers.firstName + " " + answers.lastName + " has been added!"));
-            restart();
-        })
+    dbIndex.roleInfo().then(([rows]) => {
+        var processedData2 = getCurrentData(rows);
+        const roleT = processedData2[0];
+        const roleID = processedData2[1];
+        dbIndex.employeeInfo().then(([rows]) => {
+            var processedData3 = getCurrentData(rows);
+            const manager = processedData3[0];
+            manager.push('N/A');
+            const eID = processedData3[1];
+
+            const addEmployeeQ = [
+                {
+                    type: 'input',
+                    name: 'firstName',
+                    message: 'Enter First Name',
+                },
+                {
+                    type: 'input',
+                    name: 'lastName',
+                    message: 'Enter Last Name',
+                },
+                {
+                    type: 'list',
+                    name: 'role',
+                    choices: roleT,
+                    message: 'Select Role',
+                },
+                {
+                    type: 'list',
+                    name: 'manager',
+                    choices: manager,
+                    message: 'Select Manager if any',
+                },
+            ];
+            inquirer.prompt(addEmployeeQ)
+                .then((answers) => {
+                    var managerID = 0;
+                    let mIndex = 0;
+                    if (answers.manager == 'N/A') {
+                        managerID = null;
+                    } else {
+                        mIndex = manager.indexOf(answers.manager);
+                        managerID = eID[mIndex];
+                    }
+
+                    let rIndex = roleT.indexOf(answers.role);
+                    console.log(mIndex, rIndex)
+                    dbIndex.addEmployee(answers.firstName, answers.lastName, roleID[rIndex], managerID).then(console.log("New Employee '" + answers.firstName + " " + answers.lastName + " has been added!"));
+                    restart();
+                });
+        });
+    });
+
 };
+
+function updateRole() {
+    dbIndex.employeeInfo().then(([rows]) => {
+        var processedData = getCurrentData(rows);
+        const employees = processedData[0];
+        const eID = processedData[1];
+        console.log("----------------------");
+        console.log(employees);
+        console.log(eID);
+
+        dbIndex.roleInfo().then(([rows]) => {
+            var processedData1 = getCurrentData(rows);
+            const rTitles = processedData1[0];
+            const rID = processedData1[1];
+
+            const changeRole = [
+                {
+                    type: 'list',
+                    name: 'employee',
+                    choices: employees,
+                    message: 'Which employee would you like to update?',
+                },
+                {
+                    type: 'list',
+                    name: 'role',
+                    choices: rTitles,
+                    message: 'Select new Role',
+                },
+
+
+            ];
+            inquirer.prompt(changeRole).then((answer) => {
+                //getting indexes for employee elements and roles, to get ID index
+                let index = employees.indexOf(answer.employee);
+                let roleIndex = rTitles.indexOf(answer.role);
+                dbIndex.updateRoles(rID[roleIndex], eID[index]).then(console.log(`Role of the following employee ${answer.employee} has been updated. New role: ${answer.role}`));
+                restart();
+            });
+        });
+    });
+
+}
 
 init();
