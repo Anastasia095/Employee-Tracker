@@ -53,12 +53,28 @@ const addRoleQ = [
         type: 'input',
         name: 'roleTitle',
         message: 'Enter role title',
-
+        validate: function(roleTitle)
+        {
+            if(!roleTitle){
+                return "Please enter Role Title"
+            }
+            return true;
+        }
     },
     {
         type: 'input',
         name: 'salary',
         message: 'Enter role salary',
+        validate: function(salary)
+        {
+            if(!salary){
+                return "Please enter Salary"
+            }
+            else if(isNaN(salary)){
+                return "Please enter valid Salary"
+            }
+            return true;
+        }
 
     },
 ];
@@ -68,6 +84,13 @@ const addDepartmentQ = [
         type: 'input',
         name: 'depName',
         message: 'Enter Department Name',
+        validate: function(depName)
+        {
+            if(!depName){
+                return "Please enter Department Name"
+            }
+            return true;
+        }
     },
 
 ];
@@ -189,11 +212,26 @@ function addEmployee() {
                     type: 'input',
                     name: 'firstName',
                     message: 'Enter First Name',
+                    validate: function(firstName)
+                    {
+                        if(!firstName){
+                            return "Please enter First Name"
+                        }
+                        return true;
+                    }
+                    
                 },
                 {
                     type: 'input',
                     name: 'lastName',
                     message: 'Enter Last Name',
+                    validate: function(lastName)
+                    {
+                        if(!lastName){
+                            return "Please enter Last Name"
+                        }
+                        return true;
+                    }
                 },
                 {
                     type: 'list',
@@ -234,9 +272,6 @@ function updateRole() {
         var processedData = getCurrentData(rows);
         const employees = processedData[0];
         const eID = processedData[1];
-        console.log("----------------------");
-        console.log(employees);
-        console.log(eID);
 
         dbIndex.roleInfo().then(([rows]) => {
             var processedData1 = getCurrentData(rows);
