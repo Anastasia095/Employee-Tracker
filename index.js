@@ -47,36 +47,6 @@ const backToMenu = [{
     message: 'Select Yes to perform another action or No to Quit',
 }
 
-]
-const addRoleQ = [
-    {
-        type: 'input',
-        name: 'roleTitle',
-        message: 'Enter role title',
-        validate: function(roleTitle)
-        {
-            if(!roleTitle){
-                return "Please enter Role Title"
-            }
-            return true;
-        }
-    },
-    {
-        type: 'input',
-        name: 'salary',
-        message: 'Enter role salary',
-        validate: function(salary)
-        {
-            if(!salary){
-                return "Please enter Salary"
-            }
-            else if(isNaN(salary)){
-                return "Please enter valid Salary"
-            }
-            return true;
-        }
-
-    },
 ];
 
 const addDepartmentQ = [
@@ -84,9 +54,8 @@ const addDepartmentQ = [
         type: 'input',
         name: 'depName',
         message: 'Enter Department Name',
-        validate: function(depName)
-        {
-            if(!depName){
+        validate: function (depName) {
+            if (!depName) {
                 return "Please enter Department Name"
             }
             return true;
@@ -98,7 +67,8 @@ function init() {
     const displayLogo = logo({ name: "employee Manager " }).render();
     //rendering logo
     console.log(displayLogo);
-    prompts();
+    addRole();
+    // prompts();
 }
 
 function restart() {
@@ -189,11 +159,53 @@ function AddDepartment() {
 };
 
 function addRole() {
-    inquirer.prompt(addRoleQ)
-        .then((answers) => {
-            dbIndex.addRole(answers);
-            restart();
-        })
+    dbIndex.findAllDepartments().then(([rows]) => {
+        var depData = getCurrentData(rows);
+        const deptID = depData[0];
+        const depTitle = depData[1];
+        const addRoleQ = [
+            {
+                type: 'input',
+                name: 'roleTitle',
+                message: 'Enter role title',
+                validate: function (roleTitle) {
+                    if (!roleTitle) {
+                        return "Please enter Role Title"
+                    }
+                    return true;
+                }
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'Enter role salary',
+                validate: function (salary) {
+                    if (!salary) {
+                        return "Please enter Salary"
+                    }
+                    else if (isNaN(salary)) {
+                        return "Please enter valid Salary"
+                    }
+                    return true;
+                }
+
+            },
+            {
+                type: 'list',
+                name: 'department',
+                choices: depTitle,
+                message: 'Select Department',
+
+            },
+        ];
+        inquirer.prompt(addRoleQ)
+            .then((answers) => {
+                let j = depTitle.indexOf(answers.department);
+                dbIndex.addRole(answers.roleTitle, answers.salary, deptID[j]);
+                restart();
+            });
+    });
+
 };
 
 function addEmployee() {
@@ -212,22 +224,20 @@ function addEmployee() {
                     type: 'input',
                     name: 'firstName',
                     message: 'Enter First Name',
-                    validate: function(firstName)
-                    {
-                        if(!firstName){
+                    validate: function (firstName) {
+                        if (!firstName) {
                             return "Please enter First Name"
                         }
                         return true;
                     }
-                    
+
                 },
                 {
                     type: 'input',
                     name: 'lastName',
                     message: 'Enter Last Name',
-                    validate: function(lastName)
-                    {
-                        if(!lastName){
+                    validate: function (lastName) {
+                        if (!lastName) {
                             return "Please enter Last Name"
                         }
                         return true;

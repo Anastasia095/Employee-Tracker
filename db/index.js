@@ -33,8 +33,8 @@ class DBclass {
         return this.connection.promise().query(`INSERT INTO department_name (dep_name) VALUES (${department})`);
     }
 
-    addRole(role) {
-        return this.connection.promise().query(`INSERT INTO roles (title, salary) VALUES ("${role.roleTitle}", ${role.salary})`);
+    addRole(title,salary,depID ) {
+        return this.connection.promise().query(`INSERT INTO roles (title, salary, department_id) VALUES ("${title}", ${salary}, ${depID})`);
     }
     addEmployee(firstName, lastName, rID, mID) {
         return this.connection.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${firstName}", "${lastName}", ${rID},  ${mID})`);
