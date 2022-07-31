@@ -267,7 +267,6 @@ function addEmployee() {
                     }
 
                     let rIndex = roleT.indexOf(answers.role);
-                    console.log(mIndex, rIndex)
                     dbIndex.addEmployee(answers.firstName, answers.lastName, roleID[rIndex], managerID).then(console.log("New Employee '" + answers.firstName + " " + answers.lastName + " has been added!"));
                     restart();
                 });

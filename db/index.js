@@ -30,7 +30,7 @@ class DBclass {
     }
     //create a new department
     addDepartment(department) {
-        return this.connection.promise().query(`INSERT INTO department_name (dep_name) VALUES (${department})`);
+        return this.connection.promise().query(`INSERT INTO department_name (dep_name) VALUES ("${department}")`);
     }
 
     addRole(title,salary,depID ) {
